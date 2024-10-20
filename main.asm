@@ -31,6 +31,10 @@ welcome:
 	jr $ra
 prompt:
 	print_str (mode_msg)
+	print_str (mode_prmpt)
+	
+	read_str(buffer, 32)
+	
 	jr $ra
 
 again_loop:

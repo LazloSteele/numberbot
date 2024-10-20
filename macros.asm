@@ -25,7 +25,8 @@
 	reset_buffer (%buffer_address, %buffer_size)	# clear the buffer
 	li $v0, 8										# prepare to read string
 	la $a0, %buffer_address							# load the buffer address
-	li $a1, %buffer_size							# load the number of characters (+1 for line termination)
+	li $a1, %buffer_size							# load the number of characters 
+	addi $a1, $a1, 1								# (+1 for line termination)
 	syscall											# read that string!
 .end_macro											#
 ####################################################################################################
