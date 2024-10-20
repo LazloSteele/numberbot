@@ -9,3 +9,30 @@
 # Algorithmic Description:
 #	
 ####################################################################################################
+
+.include 	"macros.asm"
+.include	"messages.asm"
+
+.data
+			.align	2
+	buffer:	.space	32
+
+.globl	main
+
+.text
+main:
+	call (welcome)
+	call (prompt)
+	
+	j again_loop
+	
+welcome:
+	print_str (welcome_msg)
+	jr $ra
+prompt:
+	print_str (mode_msg)
+	jr $ra
+
+again_loop:
+	again
+	j again_loop

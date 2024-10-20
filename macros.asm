@@ -51,34 +51,6 @@
 		bne $t2, 0, upper_loop	# if not end of buffer go again!
 .end_macro						#
 ####################################################################################################
-# macro: alpha
-# purpose: to make printing messages more eloquent
-# registers used:
-#	$t0 - string to check for upper case
-#	$t1 - ascii 'a', 'A'-'Z' is all lower value than 'a'
-# variables used:
-#	%message - message to be printed
-####################################################################################################
-.macro alpha (%char)			#
-	move $t2, %char				# 
-	li $t8, 0					#
-								#
-	blt $t2, 'A', invalid		# If byte is less than ascii 'A' then it's not alphabetic
-	bgt $t2, 'Z', mebbe			# If byte is greater than 'Z' then maybe valid as a lower but also maybe punctuation
-	j valid						#
-								#
-	mebbe:						#
-		blt $t2, 'a', invalid	# If byte is less than ascii 'a' it is invalid
-		bgt $t2, 'z', invalid	# If byte is greater than ascii 'z' then it's not alphabetic
-		j valid					#
-	valid:						#
-		li $t8, 1				#
-		j alpha_end				# iterate!
-	invalid:					#
-		j alpha_end				# do nothing and iterate!
-	alpha_end:					#
-.end_macro						#
-####################################################################################################
 # function: again
 # purpose: to user to repeat or close the program
 # registers used:
@@ -136,7 +108,26 @@
 ####################################################################################################	
 .macro end 					#
 	print_str (bye)	 		# load address of bye into $a0
-	li $v0, 10				# system call code for returning control to system
+	li 		$v0, 10			# system call code for returning control to system
 	syscall					# GOODBYE!
 .end_macro					#
 ####################################################################################################
+.macro call (%function)
+							# Save registers (prologue)
+	addi	$sp, $sp, -20	# Make space on stack for $ra and $a0
+	sw		$ra, 0($sp)		# Save return address
+	sw		$a0, 4($sp)		# Save argument (if any)
+	sw		$a1, 8($sp)		# Save argument (if any)
+	sw		$a2, 12($sp)	# Save argument (if any)
+	sw		$a3, 16($sp)	# Save argument (if any)
+    						#
+    jal %function			# Call the function!
+    						#
+							# Restore registers (epilogue)
+    lw		$a3, 16($sp)	# Restore argument (if any)
+    lw		$a2, 12($sp)	# Restore argument (if any)
+    lw		$a1, 8($sp)		# Restore argument (if any)
+    lw		$a0, 4($sp)		# Restore argument (if any)
+    lw		$ra, 0($sp)		# Restore return address
+    addi	$sp, $sp, 20	# Adjust stack pointer
+.end_macro
